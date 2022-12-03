@@ -1,11 +1,5 @@
 import { defineStore } from "pinia";
-
-export type User = {
-  name: string;
-  about: string;
-  picture: string;
-  pubkey: string;
-};
+import type { User } from "@/stores/index";
 
 export const useUserStore = defineStore("users", {
   state: () => {

@@ -1,14 +1,5 @@
 import { defineStore } from "pinia";
-
-export type Event = {
-  id: string;
-  pubkey: string;
-  created_at: number;
-  kind: number;
-  tags: string[];
-  content: string;
-  sig: string;
-};
+import type { Event, User } from "@/stores/index";
 
 export const useEventStore = defineStore("events", {
   state: () => {
@@ -38,11 +29,14 @@ export const useEventStore = defineStore("events", {
       this.events.delete(id);
       this.replyMap.delete(id);
     },
-    addReply(id: string, replyid: string) {
-      this.replyMap.set(id, replyid);
+    addReply(id: string, replyToId: string, replyType: string) {
+      this.replyMap.set(id, { id: replyToId, type: replyType });
     },
     getReply(id: string) {
       return this.replyMap.get(id);
+    },
+    getAllReplies() {
+      return this.replyMap;
     },
     all() {
       const sorted_map_by_str_values = new Map(
@@ -52,6 +46,16 @@ export const useEventStore = defineStore("events", {
       );
 
       return sorted_map_by_str_values;
+    },
+    setUser(id: string, user: User) {
+      this.events.get(id).user = user;
+    },
+    setReply(id: string, event: Event) {
+      if (this.events.get(id)) {
+        this.events.get(id).reply = event;
+      } else {
+        console.log("Do not have the reponse event yet to set reply data.");
+      }
     },
     get(id: string): Event | null {
       if (this.events.get(id)) {

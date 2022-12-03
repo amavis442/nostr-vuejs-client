@@ -1,6 +1,12 @@
 # NostrVueClient
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a WIP to for now read events from relays and show them in a Telegram style way. It is written in vuejs and typescript
+which brings it own challenges.
+Getting all the data and not call functions that should wait is another. The relay that i used sends an EOSE (End Of Stored Events)
+but still some recrds come in after this. That is why i use Timeouts untill i can find a better solution to tacle this.
+
+For now it is a readonly client becuase it is also a proof of concept. So half of NIP-01 is implemented with kind 0,1. When that works better
+i will start with implemented more settings and the ability to send Events and not only receive them.
 
 ## Recommended IDE Setup
 

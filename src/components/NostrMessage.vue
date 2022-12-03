@@ -2,27 +2,26 @@
   <div class="message">
     <span class="picture"></span>
     <div class="bubble">
-      <div class="author" :data-author="user?.pubkey">
-        <img :src="user?.picture" class="profile" v-if="user?.picture" />
-        <span class="colorFont">
-          {{ author() }}
+      <div class="author" :data-author="event.user?.pubkey">
+        <img :src="event.user?.picture" class="profile" v-if="event.user?.picture" />
+        <span class="colorFont()">
+          {{ author(event) }}
           <br />
-          <small> {{ user?.about }}</small>
+          <small> {{ event.user?.about }}</small>
         </span>
       </div>
       <div class="msgtext">
-        <span v-if="replyContent">
+        <span v-if="event.reply?.content">
           <blockquote class="blockquote reply">
             <p class="mb-1 fst-italic fs-6">
               <font-awesome-icon icon="fa-solid fa-quote-left" />
-              {{ replyContent }}
+              {{ event.reply?.content }}
               <font-awesome-icon icon="fa-solid fa-quote-right" />
             </p>
-            <footer class="blockquote-footer">{{ replyUser?.name }}</footer>
+            <footer class="blockquote-footer">{{ event.reply?.user?.name ?  event.reply?.pubkey : "" }}</footer>
           </blockquote>
           <br />
         </span>
-
         {{ event.content }}
       </div>
       <div class="time bubbletime" :data-timestamp="event.created_at">
@@ -33,44 +32,19 @@
 </template>
 
 <script setup lang="ts">
-import type { Event } from "@/stores/events";
-import { useUserStore, type User } from "@/stores/users";
-import { useEventStore } from "@/stores/events";
+import type { Event } from "@/stores/index";
 import { colors } from "@/settings";
 
 interface Props {
   event: Event;
 }
 const props = defineProps<Props>();
-const storeUser = useUserStore();
-const storeEvent = useEventStore();
-const user = storeUser.get(props.event.pubkey);
-
-let replyContent: string | null = null;
-let replyUser: User | null = null;
-const replyId = storeEvent.getReply(props.event.id);
-if (replyId) {
-  const replyEvent: Event | undefined = storeEvent.getFromMap(replyId);
-  if (replyEvent) {
-    replyContent = replyEvent.content;
-    replyUser = storeUser.get(replyEvent.pubkey)
-      ? storeUser.get(replyEvent.pubkey)
-      : {
-          pubkey: replyEvent.pubkey,
-          name: replyEvent.pubkey,
-          about: "",
-          picture: "",
-        };
-  }
-  if (!replyEvent) {
-    console.log("We hebben een replyId, maar niet de event data");
-  }
-}
 
 function myStyle() {
   let color = "#fc91a3";
-  if (user?.pubkey) {
-    color = colors[user.pubkey.toString().slice(0, 1).toLowerCase()];
+  if (props.event.user?.pubkey) {
+    color =
+      colors[props.event.user?.pubkey.toString().slice(0, 1).toLowerCase()];
   }
   return color;
 }
@@ -87,8 +61,8 @@ function getTime() {
   });
 }
 
-function author() {
-  return user?.name ? user?.name : props.event.pubkey;
+function author(event: Event): string {
+  return event.user?.name ? event.user?.name : event.pubkey;
 }
 </script>
 
