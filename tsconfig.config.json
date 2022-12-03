@@ -1,0 +1,32 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.node.json",
+  "include": ["vite.config.*", "vitest.config.*", "cypress.config.*", "playwright.config.*"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "composite": true,
+    "types": ["node","crypto-js"],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "outDir": "./dist",
+    "isolatedModules": true,
+    "noImplicitThis": true,
+    "declarationMap": true,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext","DOM"],
+    "incremental": true,
+    "newLine": "LF"
+  },
+  "ts-node": {
+    "transpileOnly": true
+  }
+}
