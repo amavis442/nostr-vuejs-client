@@ -17,12 +17,6 @@ export const useUserStore = defineStore("users", {
   },
   actions: {
     add(user: User) {
-      /*const user: User = {
-        name: name,
-        about: about,
-        picture: picture,
-        pubkey: pubkey,
-      };*/
       this.users[user.pubkey] = user;
     },
     remove(pubKey: string) {

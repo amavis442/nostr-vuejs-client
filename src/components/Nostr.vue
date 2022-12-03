@@ -3,9 +3,6 @@
 import { onMounted } from "vue";
 import NostrMessage from "./NostrMessage.vue";
 import { pool, sendRequest } from "@/nostr/nostr";
-
-//import { relayPool } from "nostr-tools";
-
 import { useFollowStore } from "@/stores/follow";
 import { useRelayStore } from "@/stores/relays";
 import { useEventStore, type Event } from "@/stores/events";
@@ -16,8 +13,6 @@ const storeFollow = useFollowStore();
 const storeRelay = useRelayStore();
 const storeEvent = useEventStore();
 const storeUser = useUserStore();
-
-//const pool = relayPool();
 
 storeRelay.add(relays[0]);
 storeRelay.add(relays[1]);
@@ -193,12 +188,6 @@ ul.no-bullets {
 
 <template>
   <div>
-    <h1>
-      Account: {{ storeUser.get(ourPubKey)?.name }}<br />
-      <span style="font-size: small">{{
-        storeUser.get(ourPubKey)?.about
-      }}</span>
-    </h1>
     <div class="chat">
       <div class="content">
         <div
