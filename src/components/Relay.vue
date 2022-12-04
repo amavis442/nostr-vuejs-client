@@ -32,31 +32,10 @@ function remove(relay: string) {
           <input
             type="text"
             v-model="relay"
-            placeholder="edit me"
+            placeholder="wss://relay.nostr.info"
             class="form-control"
           />
         </div>
-        <div class="col">
-          <div class="form-check">
-            <input
-              type="checkbox"
-              v-model="write"
-              class="form-check-input"
-              id="relayWrite"
-            />
-            <label class="form-check-label" for="relayWrite">write</label>
-          </div>
-          <div class="form-check">
-            <input
-              type="checkbox"
-              v-model="read"
-              class="form-check-input"
-              id="relayRead"
-            />
-            <label class="form-check-label" for="relayRead">read</label>
-          </div>
-        </div>
-
         <div class="col">
           <button @click="add" type="button" class="btn btn-primary">
             <font-awesome-icon icon="fa-solid fa-plus" />

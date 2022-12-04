@@ -73,22 +73,7 @@ function author(event: Event): string {
 </script>
 
 <style>
-.profile {
-  width: 50px;
-  height: 50px;
-}
-
-.reply {
-  background-color: rgb(156, 156, 156);
-  padding: 1em;
-  border-radius: 20px;
-}
-
-.note-text-color {
-  color: v-bind("myColor.color");
-}
-
-.chat .content .message-content .message {
+.content .message-content .message {
   align-self: flex-start;
   margin-bottom: 20px;
   word-break: break-word;
@@ -96,19 +81,7 @@ function author(event: Event): string {
   width: 100%;
 }
 
-.chat .content .message-content .picture {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  vertical-align: middle;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: pointer;
-}
-
-.chat .content .message-content .bubble {
+.content .message-content .message .bubble {
   display: inline-block;
   padding: 6px 12px;
   /* background-color: white; */
@@ -122,17 +95,39 @@ function author(event: Event): string {
   transition: box-shadow 0.6s ease-in-out;
 }
 
-.chat .content .message-content .message .bubbletime {
+.content .message-content .message .bubble .reply {
+  background-color: rgb(156, 156, 156);
+  padding: 1em;
+  border-radius: 20px;
+}
+
+.content .message-content .message .bubble .note-text-color {
+  color: v-bind("myColor.color");
+}
+
+.content .message-content .message .bubble .picture {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+}
+
+.content .message-content .message .bubble .bubbletime {
   font-size: 11px;
   text-align: right;
   color: var(--color-secondary);
 }
 
-.chat .content .message-content .message .bubble .pink {
+.content .message-content .message .bubble .pink {
   color: #fc91a3;
 }
 
-.msgtext {
+.content .message-content .message .bubble .msgtext {
   color: black;
 }
 </style>

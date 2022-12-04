@@ -3,18 +3,21 @@ import Follow from "../components/Follow.vue";
 </script>
 
 <template>
-  <main>
+  <main class="content">
     <h1>To follow</h1>
-    <hr/>
+    <hr />
     <Follow />
   </main>
 </template>
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
+.content {
+  flex: 2;
+  border-left: 1px solid var(--background-color-3);
+  display: flex;
+  flex-direction: column;
+  background-size: 600px;
+  overflow-y: scroll;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 </style>

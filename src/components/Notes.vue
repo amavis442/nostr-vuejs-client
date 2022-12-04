@@ -185,68 +185,25 @@ ul.no-bullets {
   /* Remove margins */
 }
 
-:root {
-  --color-primary: #333;
-  --color-secondary: #999;
-  --color-accent: lightblue;
-  --color-accent-2: black;
-  --background-color: #fff;
-  --background-color-2: #eee;
-  --background-color-3: #ddd;
-  --background-accent: #2196f3;
-}
-
-* {
-  padding: 0;
-  margin: 0;
-  border: none;
-  text-decoration: none;
-  list-style: none;
-}
-
-.chat {
-  height: 100%;
-}
-
-.chat .content {
-  flex: 1;
-  flex-grow: 1;
-  border-left: 1px solid var(--background-color-3);
-  display: flex;
-  flex-direction: column;
-  /* background: url(../cartoons.png) repeat center center fixed; */
-  background-size: 600px;
-  overflow-y: scroll;
-}
-
-.chat .content .message-content {
+.content .message-content {
   position: relative;
-  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 15px;
-  overflow: auto;
   background-size: 600px;
-  overflow-x: clip;
 }
 
-.chat .content .message-content * {
+.content .message-content * {
   max-width: calc(100vw - 20px);
 }
 </style>
 
 <template>
-  <div>
-    <div class="chat">
-      <div class="content">
-        <div
-          v-for="[key, note] in storeNote.all()"
-          :key="key"
-          class="message-content"
-        >
-          <Note :note="note" />
-        </div>
-      </div>
-    </div>
+  <div
+    v-for="[key, note] in storeNote.all()"
+    :key="key"
+    class="message-content"
+  >
+    <Note :note="note" />
   </div>
 </template>

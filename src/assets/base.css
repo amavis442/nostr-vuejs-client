@@ -19,6 +19,15 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  --color-primary: #333;
+  --color-secondary: #999;
+  --color-accent: lightblue;
+  --color-accent-2: black;
+  --background-color: #fff;
+  --background-color-2: #eee;
+  --background-color-3: #ddd;
+  --background-accent: #2196f3;
 }
 
 /* semantic color variables for this project */
@@ -50,17 +59,13 @@
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  position: relative;
-  font-weight: normal;
+#app .content .message-content::before {
+  content: '';
+  margin-bottom: auto;
 }
 
 body {
-  min-height: 100vh;
+  height: 100%;
   color: var(--color-text);
   background: var(--color-background);
   transition: color 0.5s, background-color 0.5s;

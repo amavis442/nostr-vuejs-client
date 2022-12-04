@@ -14,33 +14,31 @@ follow.forEach((element) => {
 </script>
 
 <template>
-  <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="@/assets/logo.svg"
-      width="125"
-      height="125"
-    />
-
-    <div class="wrapper">
-      <nav>
+  <div class="wrapper">
+    <header>
+      <nav class="nav flex-column">
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/relays">Relays</RouterLink>
         <RouterLink to="/follow">Follow</RouterLink>
         <RouterLink to="/profile">Profile</RouterLink>
         <RouterLink to="/settings">Settings</RouterLink>
+        <RouterLink to="/about">About</RouterLink>
       </nav>
-    </div>
-  </header>
-
-  <RouterView />
+    </header>
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
-  max-height: 100vh;
+  height: 100%;
+  flex: 1;
+}
+
+.wrapper {
+  display: flex;
+  flex: 1;
 }
 
 .logo {
@@ -78,17 +76,18 @@ nav a:first-of-type {
     display: flex;
     place-items: center;
     padding-right: calc(var(--section-gap) / 2);
+    background-color: var(--vt-c-divider-light-2);
   }
 
   .logo {
     margin: 0 2rem 0 0;
   }
 
-  header .wrapper {
+  header {
+    width: 300px;
+    max-width: 300px;
     display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-    flex-grow: 0;
+    flex-direction: column;
   }
 
   nav {
