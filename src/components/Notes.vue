@@ -56,7 +56,7 @@ function processNotes(data: Array<Event>): void {
       case 1:
         if (
           !storeNote.get(note.id) &&
-          !deletedNotes.indexOf(note.id)
+          !deletedNotes.find((element) => element == note.id)
         ) {
           const user: User | null = storeUser.get(note.pubkey);
           if (user) {
