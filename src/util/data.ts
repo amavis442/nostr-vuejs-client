@@ -1,4 +1,4 @@
-export function getTime(t: number) {
+export function getTime(t: number): string {
   return new Date(t * 1000).toLocaleDateString("nl-NL", {
     day: "numeric",
     month: "numeric",
@@ -7,4 +7,9 @@ export function getTime(t: number) {
     minute: "numeric",
     second: "numeric",
   });
+}
+
+export function now(): number {
+  const date = new Date();
+  return date.valueOf() / 1000;
 }
