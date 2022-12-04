@@ -10,7 +10,7 @@
           <small class="text-muted fst-italic"> {{ note.user?.about }}</small>
         </span>
       </div>
-      <hr/>
+      <hr />
       <div class="msgtext">
         <span v-if="note.reply?.content">
           <blockquote class="blockquote reply">
@@ -26,7 +26,7 @@
         <span v-html="getNoteContent()"></span>
       </div>
       <div class="time bubbletime" :data-timestamp="note.created_at">
-        {{ getTime() }}
+        {{ getTime(note.created_at) }}
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@
 import type { Event } from "@/stores/index";
 import { colors } from "@/settings";
 import { toHtml } from "@/util/html";
-
+import { getTime } from "@/util/data";
 interface Props {
   note: Event;
 }
@@ -56,16 +56,6 @@ function myStyle() {
 }
 
 const myColor = { color: myStyle() };
-
-function getTime() {
-  return new Date(props.note.created_at * 1000).toLocaleDateString("nl-NL", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  });
-}
 
 function author(event: Event): string {
   return event.user?.name ? event.user?.name : event.pubkey;
