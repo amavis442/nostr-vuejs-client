@@ -33,12 +33,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Event } from "@/stores/index";
+import type { NoteEvent } from "@/stores/index";
 import { colors } from "@/settings";
 import { toHtml } from "@/util/html";
 import { getTime } from "@/util/data";
 interface Props {
-  note: Event;
+  note: NoteEvent;
 }
 const props = defineProps<Props>();
 
@@ -57,7 +57,7 @@ function myStyle() {
 
 const myColor = { color: myStyle() };
 
-function author(event: Event): string {
+function author(event: NoteEvent): string {
   return event.user?.name ? event.user?.name : event.pubkey;
 }
 </script>

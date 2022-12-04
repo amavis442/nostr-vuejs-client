@@ -1,3 +1,5 @@
+import { type Event as NostrEvent } from "nostr-tools";
+
 export type User = {
   name: string;
   about: string;
@@ -5,7 +7,7 @@ export type User = {
   pubkey: string;
 };
 
-export type Event = {
+export type Event = NostrEvent & {
   id: string;
   pubkey: string;
   created_at: number;
@@ -13,6 +15,11 @@ export type Event = {
   tags: string[];
   content: string;
   sig: string;
+};
+
+export type NoteEvent = Event & {
   user?: User;
   reply?: Event;
 };
+
+export type SubscriptionCallback = (event: Event, relay: string) => void;

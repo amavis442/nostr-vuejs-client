@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Event, User } from "@/stores/index";
+import type { Event, User, NoteEvent } from "@/stores/index";
 
 export const useNotesStore = defineStore("notes", {
   state: () => {
@@ -57,7 +57,7 @@ export const useNotesStore = defineStore("notes", {
         console.log("Do not have the reponse event yet to set reply data.");
       }
     },
-    get(id: string): Event | null {
+    get(id: string): NoteEvent | null {
       if (this.notes.get(id)) {
         return this.notes.get(id);
       }
