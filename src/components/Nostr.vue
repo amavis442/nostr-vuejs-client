@@ -2,10 +2,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import NostrMessage from "./NostrMessage.vue";
-import { pool } from "@/nostr/nostr";
+import { pool, sendRequest } from "@/nostr/nostr";
 import { useFollowStore } from "@/stores/follow";
 import { useRelayStore } from "@/stores/relays";
-import { useEventStore } from "@/stores/events";
+import { useNotesStore } from "@/stores/notes";
 import type { Event, User } from "@/stores/index";
 
 import { useUserStore } from "@/stores/users";
@@ -14,7 +14,7 @@ import type { Filter, Subscription } from "nostr-tools";
 
 const storeFollow = useFollowStore();
 const storeRelay = useRelayStore();
-const storeEvent = useEventStore();
+const storeNote = useNotesStore();
 const storeUser = useUserStore();
 
 storeRelay.add(relays[0]);
@@ -24,144 +24,121 @@ follow.forEach((element) => {
   storeFollow.add(element);
 });
 
-function onMetaData(event: Event, _url: string): void {
-  const { kind, content, pubkey } = event || {};
-  if (!pubkey) return;
-  let p: any = pubkey.toString();
-  if (storeUser.get(p)) return;
+function processContacts(data: Array<Event>): void {
+  data.forEach((event) => {
+    const { kind, content, pubkey } = event || {};
+    if (!pubkey) return;
+    let p: any = pubkey.toString();
 
-  if (kind == 0) {
-    let accountData = JSON.parse(content);
-    if (accountData) {
-      const user: User = {
-        pubkey: p,
-        name: accountData.name ? accountData.name : "",
-        about: accountData.about ? accountData.about : "",
-        picture: accountData.picture ? accountData.picture : "",
-      };
+    if (!storeUser.get(p) && kind == 0) {
+      let accountData = JSON.parse(content);
+      if (accountData) {
+        const user: User = {
+          pubkey: p,
+          name: accountData.name ? accountData.name : "",
+          about: accountData.about ? accountData.about : "",
+          picture: accountData.picture ? accountData.picture : "",
+        };
 
-      storeUser.add(user);
+        storeUser.add(user);
+      }
     }
-  }
+  });
 }
 
-function onEvent(event: Event, _url: string): void {
-  if (event && event.kind == 1 && event.id && !storeEvent.get(event.id)) {
-    console.log("Event");
-    const user: User | null = storeUser.get(event.pubkey);
-    if (user) {
-      event.user = user;
+function processNotes(data: Array<Event>): void {
+  data.forEach((note) => {
+    if (note && note.kind == 1 && note.id && !storeNote.get(note.id)) {
+      const user: User | null = storeUser.get(note.pubkey);
+      if (user) {
+        note.user = user;
+      }
+      if (note.tags.length > 0) {
+        note.tags.forEach((element) => {
+          if (
+            element[0] == "e" &&
+            (element[3] == "root" || element[3] == "reply")
+          ) {
+            storeNote.addReply(element[1], note.id, element[3]);
+            let replyEvent: Event | null = storeNote.get(element[1]);
+            if (replyEvent) {
+              note.reply = replyEvent;
+            }
+          }
+        });
+      }
+      storeNote.add(note);
     }
-    if (event.tags.length > 0) {
-      event.tags.forEach((element) => {
-        if (
-          element[0] == "e" &&
-          (element[3] == "root" || element[3] == "reply")
-        ) {
-          storeEvent.addReply(element[1], event.id, element[3]);
-          let replyEvent: Event | null = storeEvent.get(element[1]);
-          if (replyEvent) {
-            event.reply = replyEvent;
+
+    if (note && note.kind == 0 && note.pubkey) {
+      let userData = JSON.parse(note.content);
+      let user: User;
+      if (userData) {
+        user = {
+          pubkey: note.pubkey,
+          name: userData.name ? userData.name : "",
+          about: userData.about ? userData.about : "",
+          picture: userData.picture ? userData.picture : "",
+        };
+
+        storeUser.add(user);
+
+        for (const [k, v] of storeNote.all().entries()) {
+          if (v.pubkey == user.pubkey) {
+            storeNote.setUser(k, user);
           }
         }
-      });
-    }
-    storeEvent.add(event);
-  }
-
-  if (event && event.kind == 0 && event.pubkey) {
-    let userData = JSON.parse(event.content);
-    let user: User;
-    if (userData) {
-      user = {
-        pubkey: event.pubkey,
-        name: userData.name ? userData.name : "",
-        about: userData.about ? userData.about : "",
-        picture: userData.picture ? userData.picture : "",
-      };
-
-      storeUser.add(user);
-
-      // Need some way to trigger an update to storeEvent so the screen entry gets an update. Do not like looping through it every time we get an update from an relay.
-      for (const [k, v] of storeEvent.all().entries()) {
-        if (v.pubkey == user.pubkey) {
-          storeEvent.setUser(k, user);
-        }
       }
     }
-  }
+  });
 }
 
-function onReply(event: Event, _url: string): void {
-  if (event && event.kind == 1 && event.id && !storeEvent.get(event.id)) {
-    const user: User | null = storeUser.get(event.pubkey);
-    if (user) {
-      event.user = user;
-    }
-    const replyData = storeEvent.getReply(event.id);
-    if (replyData) {
-      const user = storeUser.get(event.pubkey);
+function processReplies(data: Array<Event>): void {
+  data.forEach((note) => {
+    if (note && note.kind == 1 && note.id && !storeNote.get(note.id)) {
+      const user: User | null = storeUser.get(note.pubkey);
       if (user) {
-        event.user = user;
+        note.user = user;
       }
-      storeEvent.setReply(replyData.id, event);
+      const replyData = storeNote.getReply(note.id);
+      if (replyData) {
+        const user = storeUser.get(note.pubkey);
+        if (user) {
+          note.user = user;
+        }
+        storeNote.setReply(replyData.id, note);
+      }
+      console.log("Reply From", replyData?.id, " To ", note.id);
     }
-    console.log("Reply From", replyData?.id, " To ", event.id);
-  }
+  });
 }
 
 onMounted(async () => {
   storeRelay.all().forEach((element) => {
     pool.addRelay(element.relay, element.options);
   });
-  const channel = Math.random().toString().slice(2);
-
   // Get the names of the ones we follow if present
   let filter: Filter = {
     kinds: [0],
     authors: storeFollow.all(),
   };
 
-  let subscription: Subscription;
-  let p = Promise.resolve();
-  await new Promise((resolve) => {
-    subscription = pool.sub(
-      { cb: onMetaData, filter: filter },
-      channel,
-      (url: string) => {
-        console.log("Eose: ", url);
-        resolve(p);
-      }
-    );
-    setTimeout(() => resolve(p), 1000);
-  });
+  let data = await sendRequest(filter);
+  processContacts(data);
 
   // Get some events from 7 days with a max limit of 4000 records
   filter = {
-    kinds: [0, 1],
+    kinds: [1, 5, 7],
     authors: storeFollow.all(),
     since: Date.now() / 1000 - 2 * 60 * 60 * 24, // Events from 2 days
-    limit: 4000,
+    limit: 50,
   };
-  p = Promise.resolve();
-  await new Promise((resolve) => {
-    subscription.sub(
-      { cb: onEvent, filter: filter },
-      channel,
-      (url: string) => {
-        console.log("Eose: ", url);
-        resolve(p);
-      }
-    );
-    setTimeout(() => resolve(p), 4000);
-  });
+  data = await sendRequest(filter);
+  processNotes(data);
 
-  // What are the some of the replies. This is kind of hit and miss because of async records from the previous action
-  // can still come in after this function is called. Promise does not solve this because we do not know when all records are done
-  // even when we get an EOSE (End Of Stored Events). That is why i use Timeouts until i find a better solution.
   let replyIds: any = [];
-  storeEvent.getAllReplies().forEach((value: any, key: any) => {
-    const e = storeEvent.get(value.id);
+  storeNote.getAllReplies().forEach((value: any, key: any) => {
+    const e = storeNote.get(value.id);
     if (e && !e.reply) {
       replyIds.push(key);
     }
@@ -173,18 +150,9 @@ onMounted(async () => {
       "#e": replyIds,
       limit: maxEvents,
     };
-    p = Promise.resolve();
-    await new Promise((resolve) => {
-      subscription.sub(
-        { cb: onReply, filter: filter },
-        channel,
-        (url: string) => {
-          console.log("Eose: ", url);
-          resolve(p);
-        }
-      );
-      setTimeout(() => resolve(p), 500);
-    });
+
+    data = await sendRequest(filter);
+    processReplies(data);
   }
 });
 </script>
@@ -253,7 +221,7 @@ ul.no-bullets {
     <div class="chat">
       <div class="content">
         <div
-          v-for="[key, value] in storeEvent.all()"
+          v-for="[key, value] in storeNote.all()"
           :key="key"
           class="message-content"
         >

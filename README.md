@@ -2,8 +2,7 @@
 
 This is a WIP to for now read events from relays and show them in a Telegram style way. It is written in vuejs and typescript
 which brings it own challenges.
-Getting all the data and not call functions that should wait is another. The relay that i used sends an EOSE (End Of Stored Events),
-but still some recrds come in after this. That is why i use Timeouts until i can find a better solution to tacle this.
+Thank you [coracle](https://github.com/staab/coracle) for the ideas i can "steal" ;).
 
 For now it is a readonly client because it is also a proof of concept. So half of NIP-01 is implemented with kind 0,1. When that works better
 i will start with implementing more settings and the ability to send Events and not only receive them.

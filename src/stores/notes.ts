@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
 import type { Event, User } from "@/stores/index";
 
-export const useEventStore = defineStore("events", {
+export const useNotesStore = defineStore("notes", {
   state: () => {
-    const events = new Map();
+    const notes = new Map();
     const replyMap = new Map();
     const str = "";
     return {
-      events,
+      notes,
       replyMap,
       str,
     };
@@ -22,11 +22,11 @@ export const useEventStore = defineStore("events", {
         event.pubkey != "" &&
         event.created_at > 0
       ) {
-        this.events.set(event.id, event);
+        this.notes.set(event.id, event);
       }
     },
     remove(id: string) {
-      this.events.delete(id);
+      this.notes.delete(id);
       this.replyMap.delete(id);
     },
     addReply(id: string, replyToId: string, replyType: string) {
@@ -40,7 +40,7 @@ export const useEventStore = defineStore("events", {
     },
     all() {
       const sorted_map_by_str_values = new Map(
-        [...this.events.entries()].sort((a, b) => {
+        [...this.notes.entries()].sort((a, b) => {
           return a[1].created_at - b[1].created_at;
         })
       );
@@ -48,18 +48,18 @@ export const useEventStore = defineStore("events", {
       return sorted_map_by_str_values;
     },
     setUser(id: string, user: User) {
-      this.events.get(id).user = user;
+      this.notes.get(id).user = user;
     },
     setReply(id: string, event: Event) {
-      if (this.events.get(id)) {
-        this.events.get(id).reply = event;
+      if (this.notes.get(id)) {
+        this.notes.get(id).reply = event;
       } else {
         console.log("Do not have the reponse event yet to set reply data.");
       }
     },
     get(id: string): Event | null {
-      if (this.events.get(id)) {
-        return this.events.get(id);
+      if (this.notes.get(id)) {
+        return this.notes.get(id);
       }
       return null;
     },

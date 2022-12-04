@@ -7,22 +7,20 @@ import { useUserStore } from "@/stores/users";
 
 export const pool = relayPool();
 
-export function sendRequest(
-  callBack: SubscriptionCallback,
-  filter: {},
-  label?: string
-): Subscription {
-  console.log("Sending request: ", label);
-
+export async function sendRequest(filter: {}): Promise<Array<any>> {
   const channel = Math.random().toString().slice(2);
-  return pool.sub(
-    {
-      cb: callBack,
-      filter: filter,
-    },
-    channel,
-    (url: string) => {
-      console.log("Eose: ", url);
-    }
-  );
+  const data: any = [];
+  return new Promise((resolve) => {
+    const sub = pool.sub(
+      {
+        cb: (e) => data.push(e),
+        filter: filter,
+      },
+      channel,
+      () => {
+        sub.unsub();
+        resolve(data);
+      }
+    );
+  });
 }
