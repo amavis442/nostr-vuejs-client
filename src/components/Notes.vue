@@ -240,11 +240,11 @@ ul.no-bullets {
     <div class="chat">
       <div class="content">
         <div
-          v-for="[key, value] in storeNote.all()"
+          v-for="[key, note] in storeNote.all()"
           :key="key"
           class="message-content"
         >
-          <Note :event="value" />
+          <Note :note="note" />
         </div>
       </div>
     </div>

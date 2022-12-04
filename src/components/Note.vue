@@ -2,29 +2,30 @@
   <div class="message">
     <span class="picture"></span>
     <div class="bubble">
-      <div class="author" :data-author="event.user?.pubkey">
-        <img :src="event.user?.picture" class="profile" v-if="event.user?.picture" />
-        <span class="colorFont()">
-          {{ author(event) }}
+      <div class="author" :data-author="note.user?.pubkey">
+        <img :src="note.user?.picture" class="profile picture" v-if="note.user?.picture" />
+        <span class="note-text-color p-2" :id="note.id">
+          {{ author(note) }}
           <br />
-          <small> {{ event.user?.about }}</small>
+          <small class="text-muted fst-italic"> {{ note.user?.about }}</small>
         </span>
       </div>
+      <hr/>
       <div class="msgtext">
-        <span v-if="event.reply?.content">
+        <span v-if="note.reply?.content">
           <blockquote class="blockquote reply">
-            <p class="mb-1 fst-italic fs-6">
+            <p class="mb-1 p-3 fst-italic fs-6">
               <font-awesome-icon icon="fa-solid fa-quote-left" />
-              {{ event.reply?.content }}
+              {{ note.reply?.content }}
               <font-awesome-icon icon="fa-solid fa-quote-right" />
             </p>
-            <footer class="blockquote-footer">{{ event.reply?.user?.name ?  event.reply?.pubkey : "" }}</footer>
+            <footer class="blockquote-footer"><small>{{ note.reply?.user?.name ?  note.reply?.pubkey : "" }}</small></footer>
           </blockquote>
           <br />
         </span>
-        {{ event.content }}
+        <span v-html="getNoteContent()"></span>
       </div>
-      <div class="time bubbletime" :data-timestamp="event.created_at">
+      <div class="time bubbletime" :data-timestamp="note.created_at">
         {{ getTime() }}
       </div>
     </div>
@@ -34,17 +35,22 @@
 <script setup lang="ts">
 import type { Event } from "@/stores/index";
 import { colors } from "@/settings";
+import { toHtml } from "@/util/html";
 
 interface Props {
-  event: Event;
+  note: Event;
 }
 const props = defineProps<Props>();
 
+function getNoteContent() {
+  const noteContent = props.note.content;
+  return toHtml(noteContent);
+}
+
 function myStyle() {
   let color = "#fc91a3";
-  if (props.event.user?.pubkey) {
-    color =
-      colors[props.event.user?.pubkey.toString().slice(0, 1).toLowerCase()];
+  if (props.note.pubkey) {
+    color = colors[props.note.pubkey.toString().slice(0, 1).toLowerCase()];
   }
   return color;
 }
@@ -52,7 +58,7 @@ function myStyle() {
 const myColor = { color: myStyle() };
 
 function getTime() {
-  return new Date(props.event.created_at * 1000).toLocaleDateString("nl-NL", {
+  return new Date(props.note.created_at * 1000).toLocaleDateString("nl-NL", {
     day: "numeric",
     month: "numeric",
     year: "numeric",
@@ -75,9 +81,10 @@ function author(event: Event): string {
 .reply {
   background-color: rgb(156, 156, 156);
   padding: 1em;
+  border-radius: 20px;
 }
 
-.colorFont {
+.note-text-color {
   color: v-bind("myColor.color");
 }
 
