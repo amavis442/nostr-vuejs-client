@@ -47,48 +47,65 @@ function processContacts(data: Array<Event>): void {
 }
 
 function processNotes(data: Array<Event>): void {
+  const deletedNotes: string[] = [];
   data.forEach((note) => {
-    if (note && note.kind == 1 && note.id && !storeNote.get(note.id)) {
-      const user: User | null = storeUser.get(note.pubkey);
-      if (user) {
-        note.user = user;
-      }
-      if (note.tags.length > 0) {
-        note.tags.forEach((element) => {
-          if (
-            element[0] == "e" &&
-            (element[3] == "root" || element[3] == "reply")
-          ) {
-            storeNote.addReply(element[1], note.id, element[3]);
-            let replyEvent: Event | null = storeNote.get(element[1]);
-            if (replyEvent) {
-              note.reply = replyEvent;
+    let userData;
+    let user: User;
+
+    switch (note.kind) {
+      case 1:
+        if (
+          !storeNote.get(note.id) &&
+          !deletedNotes.find((element) => element == note.id)
+        ) {
+          const user: User | null = storeUser.get(note.pubkey);
+          if (user) {
+            note.user = user;
+          }
+          if (note.tags.length > 0) {
+            note.tags.forEach((element) => {
+              if (
+                element[0] == "e" &&
+                (element[3] == "root" || element[3] == "reply")
+              ) {
+                storeNote.addReply(element[1], note.id, element[3]);
+                let replyEvent: Event | null = storeNote.get(element[1]);
+                if (replyEvent) {
+                  note.reply = replyEvent;
+                }
+              }
+            });
+          }
+          storeNote.add(note);
+        }
+        break;
+      case 5:
+        if (storeNote.get(note.id)) {
+          storeNote.remove(note.id);
+        }
+        deletedNotes.push(note.id);
+
+        break;
+      case 0:
+        userData = JSON.parse(note.content);
+        if (userData) {
+          user = {
+            pubkey: note.pubkey,
+            name: userData.name ? userData.name : "",
+            about: userData.about ? userData.about : "",
+            picture: userData.picture ? userData.picture : "",
+          };
+
+          storeUser.add(user);
+
+          for (const [k, v] of storeNote.all().entries()) {
+            if (v.pubkey == user.pubkey) {
+              storeNote.setUser(k, user);
             }
           }
-        });
-      }
-      storeNote.add(note);
-    }
 
-    if (note && note.kind == 0 && note.pubkey) {
-      let userData = JSON.parse(note.content);
-      let user: User;
-      if (userData) {
-        user = {
-          pubkey: note.pubkey,
-          name: userData.name ? userData.name : "",
-          about: userData.about ? userData.about : "",
-          picture: userData.picture ? userData.picture : "",
-        };
-
-        storeUser.add(user);
-
-        for (const [k, v] of storeNote.all().entries()) {
-          if (v.pubkey == user.pubkey) {
-            storeNote.setUser(k, user);
-          }
+          break;
         }
-      }
     }
   });
 }
@@ -116,24 +133,27 @@ onMounted(async () => {
   storeRelay.all().forEach((element) => {
     pool.addRelay(element.relay, element.options);
   });
-  // Get the names of the ones we follow if present
-  let filter: Filter = {
-    kinds: [0],
-    authors: storeFollow.all(),
-  };
-
-  let data = await sendRequest(filter);
-  processContacts(data);
 
   // Get some events from 7 days with a max limit of 4000 records
-  filter = {
+  let filter: Filter = {
     kinds: [1, 5, 7],
-    authors: storeFollow.all(),
+    //authors: storeFollow.all(),
     since: Date.now() / 1000 - 2 * 60 * 60 * 24, // Events from 2 days
     limit: 50,
   };
-  data = await sendRequest(filter);
-  processNotes(data);
+  const noteData = await sendRequest(filter);
+
+  let pubKeys: any = [];
+  noteData.forEach((value: any, key: any) => {
+    pubKeys.push(value.pubkey);
+  });
+  filter = {
+    kinds: [0],
+    authors: pubKeys,
+  };
+  const contactData = await sendRequest(filter);
+  processContacts(contactData);
+  processNotes(noteData);
 
   let replyIds: any = [];
   storeNote.getAllReplies().forEach((value: any, key: any) => {
@@ -145,13 +165,13 @@ onMounted(async () => {
 
   if (replyIds.length > 0) {
     filter = {
-      kinds: [0, 1],
+      kinds: [0, 1, 5],
       "#e": replyIds,
       limit: maxEvents,
     };
 
-    data = await sendRequest(filter);
-    processReplies(data);
+    const replyData = await sendRequest(filter);
+    processReplies(replyData);
   }
 });
 </script>
