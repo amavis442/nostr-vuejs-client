@@ -1,10 +1,12 @@
 import {
   relayPool,
+  type Filter,
   type Subscription,
   type SubscriptionCallback,
 } from "nostr-tools";
 import { useUserStore } from "@/stores/users";
 import { useRelayStore } from "@/stores/relays";
+import { now } from "@/util/data";
 
 export const pool = relayPool();
 
@@ -32,4 +34,17 @@ export async function sendRequest(filter: {}): Promise<Array<any>> {
       }
     );
   });
+}
+
+export function eventListener(onNote: SubscriptionCallback): Subscription {
+  console.log('Start listening on channel: ', "listen");
+  const filter: Filter = { kinds: [1, 5, 7], since: now() };
+
+  return pool.sub(
+    {
+      cb: onNote,
+      filter: filter,
+    },
+    "listen"
+  );
 }
