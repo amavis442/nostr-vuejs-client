@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { onMounted } from "vue";
-import NostrMessage from "./NostrMessage.vue";
+import Note from "./Note.vue";
 import { pool, sendRequest } from "@/nostr/nostr";
 import { useFollowStore } from "@/stores/follow";
 import { useRelayStore } from "@/stores/relays";
@@ -108,7 +108,6 @@ function processReplies(data: Array<Event>): void {
         }
         storeNote.setReply(replyData.id, note);
       }
-      console.log("Reply From", replyData?.id, " To ", note.id);
     }
   });
 }
@@ -225,7 +224,7 @@ ul.no-bullets {
           :key="key"
           class="message-content"
         >
-          <NostrMessage :event="value" />
+          <Note :event="value" />
         </div>
       </div>
     </div>

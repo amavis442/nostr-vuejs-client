@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import Nostr from "../components/Nostr.vue";
+import Notes from "../components/Notes.vue";
 </script>
 
 <template>
   <main>
-    <Nostr />
+    <Notes />
   </main>
 </template>
