@@ -8,7 +8,6 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 
 /* import font awesome icon component */
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
 /* import specific icons */
 import {
   faUserSecret,
@@ -16,11 +15,12 @@ import {
   faTrash,
   faPlus,
   faQuoteRight,
-  faQuoteLeft
+  faQuoteLeft,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 
 /* add icons to the library */
-library.add(faUserSecret, faTrashCan, faTrash, faPlus, faQuoteRight, faQuoteLeft);
+library.add(faUserSecret, faTrashCan, faTrash, faPlus, faQuoteRight, faQuoteLeft, faSpinner);
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/main.css";
